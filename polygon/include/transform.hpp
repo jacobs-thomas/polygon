@@ -21,7 +21,7 @@ namespace polygon {
 		Vector2f translation;
 		Vector2f scale;
 		float rotation;
-		Matrix3x3f transformation;
+		Matrix4x4f transformation;
 
 
 	public:
@@ -37,21 +37,24 @@ namespace polygon {
 
 
 		// Methods:
-		const Matrix3x3f& GetTransformationMatrix() const {
+		const Matrix4x4f& GetTransformationMatrix() {
 
-			Matrix3x3f matrix = Matrix3x3f(1.0f);
-			matrix = glm::translate(matrix, translation);
-			matrix = glm::rotate(matrix, rotation);
-			matrix = glm::scale(matrix, scale);
+			transformation = Matrix4x4f(1.0f);
 
-			return matrix;
+			// Apply transformations
+			transformation = glm::translate(transformation, Vector3f(translation, 0.0f)); // Translation in 2D (with z=0)
+			transformation = glm::rotate(transformation, rotation, Vector3f(0.0f, 0.0f, 1.0)); // Rotation around Z-axis
+			scale.y = -1.0f; // Flip the scale.y to compensate for flipped y axis.
+			transformation = glm::scale(transformation, Vector3f(scale, 1.0f)); // 1.0f for z-axis
+
+			return transformation;  // Return by value, not reference
 		}
 
 		inline const Vector2f GetTranslation() const {
 			return translation;
 		}
 
-		const Vector2f SetTranslation(const Vector2f& translation) {
+		void SetTranslation(const Vector2f& translation) {
 			this->translation = translation;
 			transformation = GetTransformationMatrix();
 		}
@@ -77,10 +80,10 @@ namespace polygon {
 		const Vector2f Up() const {
 
 			// Define the 'up' vector (positive Y-axis in local space)
-			Vector3f up = Vector3f(0.0f, 1.0f, 0.0f);
+			Vector4f up = Vector4f(0.0f, 1.0f, 0.0f, 0.0f); // w = 0.0 for direction
 
 			// Multiply the rotation matrix with the 'up' vector
-			Vector3f rotatedUp = transformation * GLOBAL_UP;
+			Vector3f rotatedUp = transformation * up;
 
 			// Epsilon threshold to clamp small values
 			const float epsilon = 1e-6f;
@@ -93,20 +96,20 @@ namespace polygon {
 		}
 
 		const Vector2f Right() const {
-			// Define the 'up' vector (positive Y-axis in local space)
-			Vector3f up = Vector3f(1.0f, 0.0f, 0.0f);
+			// Define the 'right' vector (positive X-axis in local space)
+			Vector4f right = Vector4f(1.0f, 0.0f, 0.0f, 0.0f); // w = 0.0 for direction
 
-			// Multiply the rotation matrix with the 'up' vector
-			Vector3f rotatedUp = transformation * GLOBAL_RIGHT;
+			// Multiply the transformation matrix with the 'right' vector
+			Vector4f rotatedRight = transformation * right;
 
 			// Epsilon threshold to clamp small values
 			const float epsilon = 1e-6f;
 
-			if (fabs(rotatedUp.x) < epsilon) rotatedUp.x = 0.0f;
-			if (fabs(rotatedUp.y) < epsilon) rotatedUp.y = 0.0f;
+			if (fabs(rotatedRight.x) < epsilon) rotatedRight.x = 0.0f;
+			if (fabs(rotatedRight.y) < epsilon) rotatedRight.y = 0.0f;
 
 			// Convert back to 2D by dropping the z component
-			return Vector2f(rotatedUp.x, rotatedUp.y);
+			return Vector2f(rotatedRight.x, rotatedRight.y);
 		}
 	};
 }

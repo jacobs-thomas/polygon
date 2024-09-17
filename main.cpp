@@ -11,6 +11,7 @@
 #include <typeindex>
 
 #include "polygon/include/game_object.hpp"
+#include "polygon/include/nodes/sprite_renderer.hpp"
 
 
 namespace polygon {
@@ -86,13 +87,15 @@ int main()
     Shader spriteShader = Shader("polygon/include/shaders/sprite.vert", "polygon/include/shaders/sprite.frag");
     Texture2D texture = Texture2D("Ben.png");
 
-    glm::mat4 projection = glm::ortho(0.0f, 800.0f, 600.0f, 0.0f, -1.0f, 1.0f);
+    glm::mat4 projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f);
 
     spriteShader.Use();
     spriteShader.SetInt("image", 0);
     spriteShader.SetMatrix4f("projection", projection);
 
     SpriteRenderer* spriteRenderer = new SpriteRenderer(spriteShader, texture);
+    SpriteRendererNode spriteNode = SpriteRendererNode(&spriteShader, &texture);
+    Scene scene;
 
     // Initialization
     window.setFramerateLimit(60);  // Optionally limit the frame rate
@@ -128,7 +131,13 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // draw your sprite
-        spriteRenderer->DrawSprite(texture, glm::vec2(280.0f, 200.0f), glm::vec2(205.0f, 148.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+        //spriteRenderer->DrawSprite(texture, glm::vec2(280.0f, 200.0f), glm::vec2(205.0f, 148.0f), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+        
+        spriteNode.transform.SetTranslation(Vector2f(200.0f, 200.0f));
+        spriteNode.transform.SetRotation(glm::radians(180.0f));
+        spriteNode.transform.SetScale(Vector2f(1.0f, 1.0f));
+
+        spriteNode.OnTick(scene, 0.0f);
 
         // end the current frame (internally swaps the front and back buffers)
         window.display();
