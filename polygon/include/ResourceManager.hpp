@@ -43,16 +43,15 @@ namespace polygon {
         std::weak_ptr<Texture2D> GetTexture(const std::string& key) const {
 
             // Check if the texture exists in the map.
-            std::unordered_map<std::string, std::shared_ptr<Texture2D>>::const_iterator it = textures.find(key);
-            if (it == textures.end()) {
+            std::unordered_map<std::string, std::shared_ptr<Texture2D>>::const_iterator iterator = textures.find(key);
+            if (iterator == textures.end()) {
                 throw std::runtime_error("Texture with key '" + key + "' does not exist.");
             }
 
             // Return the weak pointer to the texture.
-            return it->second;
+            return iterator->second;
         }
 	};
 }
-
 
 #endif // !POLYGON_RESOURCE_MANAGER
