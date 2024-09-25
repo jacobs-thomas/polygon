@@ -1,5 +1,5 @@
-#ifndef POLYGON_TRANSFORM_HPP
-#define POLYGON_TRANSFORM_HPP
+#ifndef POLYGON_TRANSFORM_H
+#define POLYGON_TRANSFORM_H
 
 
 #define GLM_ENABLE_EXPERIMENTAL
@@ -16,7 +16,7 @@
 namespace polygon {
 
 	class Transform {
-	private:
+	public:
 		// Instance Attributes:
 		Vector2f translation;
 		Vector2f scale;
@@ -111,7 +111,11 @@ namespace polygon {
 			// Convert back to 2D by dropping the z component
 			return Vector2f(rotatedRight.x, rotatedRight.y);
 		}
+
+		// Operators:
+		Transform operator*(const Transform& left) const;
+		void operator*=(const Transform& left);
 	};
 }
 
-#endif // !POLYGON_TRANSFORM_HPP
+#endif // !POLYGON_TRANSFORM_H

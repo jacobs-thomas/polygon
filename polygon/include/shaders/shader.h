@@ -7,10 +7,11 @@
 #include <iostream>
 #include <glm/mat4x4.hpp>
 #include "../type_definitions.hpp"
+#include "../texture2D.hpp"
 
 namespace polygon {
 
-	class Shader {
+	class Shader : public Resource {
 
 	public:
 		// Instance Attribute:
